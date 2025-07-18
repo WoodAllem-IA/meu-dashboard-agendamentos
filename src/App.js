@@ -2,24 +2,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
 
-// Dados simulados para exibição inicial (MOVIDO PARA FORA DO COMPONENTE)
-const mockData = [
-    { id: 'W', created: '2025-07-12T20:29:56', activity: 'agendadahumano', source: 'whatsapp' },
-    { id: 'Kuka', created: '2025-07-12T20:20:00', activity: 'agendadahumano', source: 'whatsapp' },
-    { id: 'Maiane', created: '2025-07-12T16:08:12', activity: 'agendadoia', source: 'whatsapp' },
-    { id: 'Eduarda', created: '2025-07-12T14:32:04', activity: 'agendadoia', source: 'whatsapp' },
-    { id: 'Sirlene', created: '2025-07-12T14:00:30', activity: 'agendadoia', source: 'whatsapp' },
-    { id: 'Rol', created: '2025-07-12T16:17:42', activity: 'agendadoia', source: 'whatsapp' },
-    // Adicione mais dados simulados se desejar para testar os filtros
-    { id: 'TestIA_Manha_Seg', created: '2025-07-14T09:30:00', activity: 'agendadoia', source: 'test' }, // Segunda, Manhã
-    { id: 'TestHumano_Noite_Sab', created: '2025-07-12T20:00:00', activity: 'agendadahumano', source: 'test' }, // Sábado, Noite
-    { id: 'TestIA_Tarde_Ter', created: '2025-07-15T14:00:00', activity: 'agendadoia', source: 'test' }, // Terça, Tarde
-    { id: 'TestHumano_Noite_Dom', created: '2025-07-13T01:00:00', activity: 'agendadahumano', source: 'test' }, // Domingo, Madrugada (Noite)
-    { id: 'TestIA_Comercial_Qui', created: '2025-07-17T10:00:00', activity: 'agendadoia', source: 'test' }, // Quinta, Horário Comercial
-    { id: 'TestHumano_ForaComercial_Sex', created: '2025-07-18T05:00:00', activity: 'agendadahumano', source: 'test' }, // Sexta, Fora do Horário Comercial (Manhã cedo)
-    { id: 'TestIA_ForaComercial_Qua', created: '2025-07-16T19:00:00', activity: 'agendadoia', source: 'test' }, // Quarta, Fora do Horário Comercial (Noite)
-];
-
 // --- Componente para um único Grupo de Filtro (NOVO) ---
 const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
     const daysOfWeek = [
@@ -66,28 +48,19 @@ const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
 
 // --- Componente Principal do App ---
 const App = () => {
-    const [data, setData] = useState(mockData); // Inicializa com mockData
+    const [data, setData] = useState([]);
     // Estado dos filtros agora é um ARRAY de regras
     const [filterRules, setFilterRules] = useState([]);
     const [globalFilters, setGlobalFilters] = useState({ startDate: '', endDate: '', type: 'all' });
     
     const [isLoading, setIsLoading] = useState(false);
-    const [showConfig, setShowConfig] = useState(true);
-    const [config, setConfig] = useState(() => {
-        // Tenta carregar a configuração salva do localStorage
-        const savedConfig = localStorage.getItem('dashboardConfig');
-        if (savedConfig) {
-            return JSON.parse(savedConfig);
-        }
-        // Se não houver configuração salva, usa os valores padrão, incluindo o Spreadsheet ID
-        return {
-            clientId: '43176476138-fc1su71bb11vfjofap8pvrs6srftd7a0.apps.googleusercontent.com',
-            spreadsheetId: '1rTeyXyOBe1CfjOPB2hrCjSuob1E9VeYuoJvnMOWD4u4', // ID da planilha pré-preenchido
-            sheetName: 'entrada'
-        };
+    const [showConfig, setShowConfig] = useState(false); // Alterado para false para não mostrar por padrão
+    const [config, setConfig] = useState({
+        clientId: '43176476138-fc1su71bb11vfjofap8pvrs6srftd7a0.apps.googleusercontent.com',
+        spreadsheetId: '1rTeyXyOBe1CfjOPB2hrCjSuob1E9VeYuoJvnMOWD4u4', // ID da planilha pré-definido
+        sheetName: 'entrada'
     });
     const [authStatus, setAuthStatus] = useState('not_authenticated');
-    const [tokenClient, setTokenClient] = useState(null); // Mantido, mas não usado diretamente na lógica final
 
     // Funções para gerenciar as regras de filtro
     const addFilterRule = () => {
@@ -102,26 +75,25 @@ const App = () => {
         setFilterRules(filterRules.filter((_, i) => i !== index));
     };
 
-    // Carrega os scripts do Google (GSI para auth, GAPI para Sheets API)
+    // ... (useEffect, initializeAndSignIn, fetchDataFromSheets - sem alterações)
     useEffect(() => {
         const gsiScript = document.createElement('script');
         gsiScript.src = 'https://accounts.google.com/gsi/client';
         gsiScript.async = true;
         gsiScript.defer = true;
-        document.head.appendChild(gsiScript  );
+        document.head.appendChild(gsiScript );
 
         const gapiScript = document.createElement('script');
         gapiScript.src = 'https://apis.google.com/js/api.js';
         gapiScript.async = true;
         gapiScript.defer = true;
-        gapiScript.onload = (  ) => window.gapi.load('client', () => {});
+        gapiScript.onload = ( ) => window.gapi.load('client', () => {});
         document.head.appendChild(gapiScript);
     }, []);
 
-    // Função para inicializar e autenticar com o Google
     const initializeAndSignIn = async () => {
         if (!window.google || !window.gapi) {
-            alert("As bibliotecas do Google ainda não carregaram. Tente novamente em alguns segundos.");
+            alert("As bibliotecas do Google ainda não carregaram. Tente novamente.");
             return;
         }
         if (!config.clientId || !config.spreadsheetId) {
@@ -133,10 +105,8 @@ const App = () => {
             const client = window.google.accounts.oauth2.initTokenClient({
                 client_id: config.clientId,
                 scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
-                callback: async (tokenResponse  ) => {
-                    if (tokenResponse.error) {
-                        throw new Error(tokenResponse.error);
-                    }
+                callback: async (tokenResponse ) => {
+                    if (tokenResponse.error) throw new Error(tokenResponse.error);
                     setAuthStatus('authenticated');
                     setShowConfig(false);
                     await window.gapi.client.init({});
@@ -145,17 +115,16 @@ const App = () => {
             });
             client.requestAccessToken();
         } catch (error) {
-            console.error('Erro na autenticação ou inicialização:', error);
+            console.error('Erro na autenticação:', error);
             setAuthStatus('error');
             alert('Erro na autenticação: ' + error.message);
         }
     };
 
-    // Função para buscar dados da planilha
     const fetchDataFromSheets = async () => {
         setIsLoading(true);
         try {
-            await window.gapi.client.load('https://sheets.googleapis.com/$discovery/rest?version=v4'  );
+            await window.gapi.client.load('https://sheets.googleapis.com/$discovery/rest?version=v4' );
             const response = await window.gapi.client.sheets.spreadsheets.values.get({
                 spreadsheetId: config.spreadsheetId,
                 range: `${config.sheetName}!A:C`,
@@ -166,11 +135,9 @@ const App = () => {
                 const processedData = rows.slice(1).map((row, index) => {
                     const [contactId, created, lastActivity] = row;
                     if (!lastActivity || !created) return null;
-
                     const activityLower = lastActivity.toLowerCase();
                     const isIA = activityLower.includes('agendadoia') || activityLower.includes('agendamento ia');
                     const isHumano = activityLower.includes('agendadahumano') || activityLower.includes('agendamento humano');
-
                     if (isIA || isHumano) {
                         return {
                             id: contactId || `contact_${index}`,
@@ -188,43 +155,19 @@ const App = () => {
         } catch (error) {
             console.error('Erro ao buscar dados:', error);
             setAuthStatus('error');
-            alert('Erro ao buscar dados da planilha. Verifique o ID da planilha e as permissões.');
+            alert('Erro ao buscar dados. Verifique o ID da planilha e permissões.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // Efeito para configurar a auto-atualização
-    useEffect(() => {
-        let intervalId;
-        // Só configura o intervalo se estiver autenticado e configurado
-        if (authStatus === 'authenticated' && config.spreadsheetId && window.gapi?.client?.sheets) {
-            // Limpa qualquer intervalo existente para evitar duplicação
-            if (intervalId) clearInterval(intervalId); 
-            
-            intervalId = setInterval(() => {
-                console.log('Atualizando dados automaticamente...');
-                fetchDataFromSheets();
-            }, 300000); // 300000 ms = 5 minutos
-        } else {
-            // Se não estiver autenticado/configurado, limpa o intervalo
-            if (intervalId) clearInterval(intervalId);
-        }
-
-        // Limpa o intervalo quando o componente é desmontado ou as dependências mudam
-        return () => {
-            if (intervalId) clearInterval(intervalId);
-        };
-    }, [authStatus, config.spreadsheetId]); // Dependências: re-executa se status de auth ou ID da planilha mudar
-
-
-    // Processamento e filtragem dos dados
+    // --- LÓGICA DE FILTRAGEM COM MÚLTIPLAS REGRAS ---
     const filteredData = useMemo(() => {
         return data.map(item => ({
             ...item,
             date: new Date(item.created),
             hour: new Date(item.created).getHours(),
-            dayOfWeek: new Date(item.created).getDay(), // 0 = Dom, 1 = Seg, ..., 6 = Sáb
+            dayOfWeek: new Date(item.created).getDay(),
             type: item.activity.toLowerCase().includes('ia') ? 'IA' : 'Humano'
         })).filter(item => {
             // Filtros Globais (Data e Tipo)
@@ -260,7 +203,7 @@ const App = () => {
         });
     }, [data, globalFilters, filterRules]);
 
-    // Métricas principais
+    // ... (metrics, dailyData, etc. - sem alterações)
     const metrics = useMemo(() => {
         const total = filteredData.length;
         const ia = filteredData.filter(item => item.type === 'IA').length;
@@ -274,7 +217,6 @@ const App = () => {
         };
     }, [filteredData]);
 
-    // Dados para gráficos
     const dailyData = useMemo(() => {
         const grouped = filteredData.reduce((acc, item) => {
             const date = item.date.toISOString().split('T')[0];
@@ -331,10 +273,21 @@ const App = () => {
                         </h1>
                         <p className="text-gray-400">Análise de agendamentos IA vs Humano</p>
                     </div>
-                    <button onClick={() => setShowConfig(!showConfig)} className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md transition-colors">
-                        <Settings className="h-4 w-4 mr-2" />
-                        Configuração
-                    </button>
+                    <div className="flex gap-3">
+                        {/* Botão para conectar diretamente */}
+                        <button 
+                            onClick={initializeAndSignIn} 
+                            disabled={authStatus === 'authenticated'}
+                            className="flex items-center px-4 py-2 bg-green-600 hover:bg-green-700 rounded-md transition-colors disabled:opacity-50"
+                        >
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            {authStatus === 'authenticated' ? 'Conectado' : 'Conectar'}
+                        </button>
+                        <button onClick={() => setShowConfig(!showConfig)} className="flex items-center px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded-md transition-colors">
+                            <Settings className="h-4 w-4 mr-2" />
+                            Configuração
+                        </button>
+                    </div>
                 </div>
 
                 {/* Config Section */}
@@ -355,16 +308,7 @@ const App = () => {
                 {/* Status Bar */}
                 {!showConfig && (
                     <div className={`rounded-lg p-4 mb-6 border flex items-center justify-between ${authStatus === 'authenticated' ? 'bg-green-800 border-green-700' : 'bg-red-800 border-red-700'}`}>
-                        <p>{authStatus === 'authenticated' ? 'Conectado!' : 'Erro na conexão.'}</p>
-                        {/* Adicionado o botão para Configurar / Autenticar quando não está conectado */}
-                        {authStatus !== 'authenticated' && (
-                            <button
-                                onClick={() => setShowConfig(true)}
-                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
-                            >
-                                Configurar / Autenticar
-                            </button>
-                        )}
+                        <p>{authStatus === 'authenticated' ? 'Conectado!' : 'Clique em "Conectar" para carregar os dados da planilha.'}</p>
                     </div>
                 )}
 
@@ -410,6 +354,7 @@ const App = () => {
                 </div>
 
                 {/* Cards & Charts */}
+                {/* ... (Restante do JSX para os cards e gráficos - sem alterações) ... */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700"><div className="flex items-center"><Calendar className="h-8 w-8 text-blue-400 mr-3" /><div><p className="text-sm font-medium text-gray-400">Total</p><p className="text-2xl font-bold">{metrics.total}</p></div></div></div>
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700"><div className="flex items-center"><TrendingUp className="h-8 w-8 text-blue-400 mr-3" /><div><p className="text-sm font-medium text-gray-400">IA</p><p className="text-2xl font-bold text-blue-400">{metrics.ia}</p><p className="text-sm text-gray-400">{metrics.iaPercentage}%</p></div></div></div>
