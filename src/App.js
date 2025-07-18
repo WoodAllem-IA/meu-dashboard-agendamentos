@@ -4,46 +4,46 @@ import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, 
 
 // --- Componente para um único Grupo de Filtro (NOVO) ---
 const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
-    const daysOfWeek = [
-        { id: 1, name: 'Seg' }, { id: 2, name: 'Ter' }, { id: 3, name: 'Qua' },
-        { id: 4, name: 'Qui' }, { id: 5, name: 'Sex' }, { id: 6, name: 'Sáb' }, { id: 0, name: 'Dom' }
-    ];
+    const daysOfWeek = [
+        { id: 1, name: 'Seg' }, { id: 2, name: 'Ter' }, { id: 3, name: 'Qua' },
+        { id: 4, name: 'Qui' }, { id: 5, name: 'Sex' }, { id: 6, name: 'Sáb' }, { id: 0, name: 'Dom' }
+    ];
 
-    const handleDayChange = (dayId) => {
-        const newDays = rule.daysOfWeek.includes(dayId)
-            ? rule.daysOfWeek.filter(d => d !== dayId)
-            : [...rule.daysOfWeek, dayId];
-        updateRule(index, { ...rule, daysOfWeek: newDays });
-    };
+    const handleDayChange = (dayId) => {
+        const newDays = rule.daysOfWeek.includes(dayId)
+            ? rule.daysOfWeek.filter(d => d !== dayId)
+            : [...rule.daysOfWeek, dayId];
+        updateRule(index, { ...rule, daysOfWeek: newDays });
+    };
 
-    return (
-        <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 relative">
-            <button onClick={() => removeRule(index)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
-                <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="text-sm font-medium text-gray-400 block mb-2">Dias da Semana</label>
-                    <div className="flex flex-wrap gap-2">
-                        {daysOfWeek.map(day => (
-                            <button key={day.id} onClick={() => handleDayChange(day.id)}
-                                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${rule.daysOfWeek.includes(day.id) ? 'bg-indigo-600 text-white' : 'bg-gray-600 hover:bg-gray-500'}`}>
-                                {day.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    <label className="text-sm font-medium text-gray-400 block mb-2">Horário (0-23h)</label>
-                    <div className="flex items-center gap-2">
-                        <input type="number" min="0" max="23" value={rule.startTime} onChange={(e) => updateRule(index, { ...rule, startTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Início" />
-                        <span>às</span>
-                        <input type="number" min="0" max="23" value={rule.endTime} onChange={(e) => updateRule(index, { ...rule, endTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Fim" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    return (
+        <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 relative">
+            <button onClick={() => removeRule(index)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
+                <Trash2 size={18} />
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="text-sm font-medium text-gray-400 block mb-2">Dias da Semana</label>
+                    <div className="flex flex-wrap gap-2">
+                        {daysOfWeek.map(day => (
+                            <button key={day.id} onClick={() => handleDayChange(day.id)}
+                                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${rule.daysOfWeek.includes(day.id) ? 'bg-indigo-600 text-white' : 'bg-gray-600 hover:bg-gray-500'}`}>
+                                {day.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <label className="text-sm font-medium text-gray-400 block mb-2">Horário (0-23h)</label>
+                    <div className="flex items-center gap-2">
+                        <input type="number" min="0" max="23" value={rule.startTime} onChange={(e) => updateRule(index, { ...rule, startTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Início" />
+                        <span>às</span>
+                        <input type="number" min="0" max="23" value={rule.endTime} onChange={(e) => updateRule(index, { ...rule, endTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Fim" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 // --- Componente Principal do App ---
@@ -55,10 +55,18 @@ const App = () => {
     
     const [isLoading, setIsLoading] = useState(false);
     const [showConfig, setShowConfig] = useState(true);
-    const [config, setConfig] = useState({
-        clientId: '43176476138-fc1su71bb11vfjofap8pvrs6srftd7a0.apps.googleusercontent.com',
-        spreadsheetId: '',
-        sheetName: 'entrada'
+    const [config, setConfig] = useState(() => {
+        // Tenta carregar a configuração salva do localStorage
+        const savedConfig = localStorage.getItem('dashboardConfig');
+        if (savedConfig) {
+            return JSON.parse(savedConfig);
+        }
+        // Se não houver configuração salva, usa os valores padrão, incluindo o Spreadsheet ID
+        return {
+            clientId: '43176476138-fc1su71bb11vfjofap8pvrs6srftd7a0.apps.googleusercontent.com',
+            spreadsheetId: '1rTeyXyOBe1CfjOPB2hrCjSuob1E9VeYuoJvnMOWD4u4', // ID da planilha pré-preenchido
+            sheetName: 'entrada'
+        };
     });
     const [authStatus, setAuthStatus] = useState('not_authenticated');
 
@@ -75,7 +83,25 @@ const App = () => {
         setFilterRules(filterRules.filter((_, i) => i !== index));
     };
 
-    // ... (useEffect, initializeAndSignIn, fetchDataFromSheets - sem alterações)
+    // Dados simulados para exibição inicial (movido para dentro do componente para acesso)
+    const mockData = [
+        { id: 'W', created: '2025-07-12T20:29:56', activity: 'agendadahumano', source: 'whatsapp' },
+        { id: 'Kuka', created: '2025-07-12T20:20:00', activity: 'agendadahumano', source: 'whatsapp' },
+        { id: 'Maiane', created: '2025-07-12T16:08:12', activity: 'agendadoia', source: 'whatsapp' },
+        { id: 'Eduarda', created: '2025-07-12T14:32:04', activity: 'agendadoia', source: 'whatsapp' },
+        { id: 'Sirlene', created: '2025-07-12T14:00:30', activity: 'agendadoia', source: 'whatsapp' },
+        { id: 'Rol', created: '2025-07-12T16:17:42', activity: 'agendadoia', source: 'whatsapp' },
+        // Adicione mais dados simulados se desejar para testar os filtros
+        { id: 'TestIA_Manha_Seg', created: '2025-07-14T09:30:00', activity: 'agendadoia', source: 'test' }, // Segunda, Manhã
+        { id: 'TestHumano_Noite_Sab', created: '2025-07-12T20:00:00', activity: 'agendadahumano', source: 'test' }, // Sábado, Noite
+        { id: 'TestIA_Tarde_Ter', created: '2025-07-15T14:00:00', activity: 'agendadoia', source: 'test' }, // Terça, Tarde
+        { id: 'TestHumano_Noite_Dom', created: '2025-07-13T01:00:00', activity: 'agendadahumano', source: 'test' }, // Domingo, Madrugada (Noite)
+        { id: 'TestIA_Comercial_Qui', created: '2025-07-17T10:00:00', activity: 'agendadoia', source: 'test' }, // Quinta, Horário Comercial
+        { id: 'TestHumano_ForaComercial_Sex', created: '2025-07-18T05:00:00', activity: 'agendadahumano', source: 'test' }, // Sexta, Fora do Horário Comercial (Manhã cedo)
+        { id: 'TestIA_ForaComercial_Qua', created: '2025-07-16T19:00:00', activity: 'agendadoia', source: 'test' }, // Quarta, Fora do Horário Comercial (Noite)
+    ];
+
+    // Carrega os scripts do Google (GSI para auth, GAPI para Sheets API)
     useEffect(() => {
         const gsiScript = document.createElement('script');
         gsiScript.src = 'https://accounts.google.com/gsi/client';
@@ -91,9 +117,10 @@ const App = () => {
         document.head.appendChild(gapiScript);
     }, []);
 
+    // Função para inicializar e autenticar com o Google
     const initializeAndSignIn = async () => {
         if (!window.google || !window.gapi) {
-            alert("As bibliotecas do Google ainda não carregaram. Tente novamente.");
+            alert("As bibliotecas do Google ainda não carregaram. Tente novamente em alguns segundos.");
             return;
         }
         if (!config.clientId || !config.spreadsheetId) {
@@ -106,7 +133,9 @@ const App = () => {
                 client_id: config.clientId,
                 scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
                 callback: async (tokenResponse ) => {
-                    if (tokenResponse.error) throw new Error(tokenResponse.error);
+                    if (tokenResponse.error) {
+                        throw new Error(tokenResponse.error);
+                    }
                     setAuthStatus('authenticated');
                     setShowConfig(false);
                     await window.gapi.client.init({});
@@ -115,12 +144,13 @@ const App = () => {
             });
             client.requestAccessToken();
         } catch (error) {
-            console.error('Erro na autenticação:', error);
+            console.error('Erro na autenticação ou inicialização:', error);
             setAuthStatus('error');
             alert('Erro na autenticação: ' + error.message);
         }
     };
 
+    // Função para buscar dados da planilha
     const fetchDataFromSheets = async () => {
         setIsLoading(true);
         try {
@@ -135,9 +165,11 @@ const App = () => {
                 const processedData = rows.slice(1).map((row, index) => {
                     const [contactId, created, lastActivity] = row;
                     if (!lastActivity || !created) return null;
+
                     const activityLower = lastActivity.toLowerCase();
                     const isIA = activityLower.includes('agendadoia') || activityLower.includes('agendamento ia');
                     const isHumano = activityLower.includes('agendadahumano') || activityLower.includes('agendamento humano');
+
                     if (isIA || isHumano) {
                         return {
                             id: contactId || `contact_${index}`,
@@ -155,19 +187,43 @@ const App = () => {
         } catch (error) {
             console.error('Erro ao buscar dados:', error);
             setAuthStatus('error');
-            alert('Erro ao buscar dados. Verifique o ID da planilha e permissões.');
+            alert('Erro ao buscar dados da planilha. Verifique o ID da planilha e as permissões.');
         } finally {
             setIsLoading(false);
         }
     };
 
-    // --- LÓGICA DE FILTRAGEM COM MÚLTIPLAS REGRAS ---
+    // Efeito para configurar a auto-atualização
+    useEffect(() => {
+        let intervalId;
+        // Só configura o intervalo se estiver autenticado e configurado
+        if (authStatus === 'authenticated' && config.spreadsheetId && window.gapi?.client?.sheets) {
+            // Limpa qualquer intervalo existente para evitar duplicação
+            if (intervalId) clearInterval(intervalId); 
+            
+            intervalId = setInterval(() => {
+                console.log('Atualizando dados automaticamente...');
+                fetchDataFromSheets();
+            }, 300000); // 300000 ms = 5 minutos
+        } else {
+            // Se não estiver autenticado/configurado, limpa o intervalo
+            if (intervalId) clearInterval(intervalId);
+        }
+
+        // Limpa o intervalo quando o componente é desmontado ou as dependências mudam
+        return () => {
+            if (intervalId) clearInterval(intervalId);
+        };
+    }, [authStatus, config.spreadsheetId]); // Dependências: re-executa se status de auth ou ID da planilha mudar
+
+
+    // Processamento e filtragem dos dados
     const filteredData = useMemo(() => {
         return data.map(item => ({
             ...item,
             date: new Date(item.created),
             hour: new Date(item.created).getHours(),
-            dayOfWeek: new Date(item.created).getDay(),
+            dayOfWeek: new Date(item.created).getDay(), // 0 = Dom, 1 = Seg, ..., 6 = Sáb
             type: item.activity.toLowerCase().includes('ia') ? 'IA' : 'Humano'
         })).filter(item => {
             // Filtros Globais (Data e Tipo)
@@ -203,7 +259,7 @@ const App = () => {
         });
     }, [data, globalFilters, filterRules]);
 
-    // ... (metrics, dailyData, etc. - sem alterações)
+    // Métricas principais
     const metrics = useMemo(() => {
         const total = filteredData.length;
         const ia = filteredData.filter(item => item.type === 'IA').length;
@@ -217,6 +273,7 @@ const App = () => {
         };
     }, [filteredData]);
 
+    // Dados para gráficos
     const dailyData = useMemo(() => {
         const grouped = filteredData.reduce((acc, item) => {
             const date = item.date.toISOString().split('T')[0];
@@ -298,6 +355,15 @@ const App = () => {
                 {!showConfig && (
                     <div className={`rounded-lg p-4 mb-6 border flex items-center justify-between ${authStatus === 'authenticated' ? 'bg-green-800 border-green-700' : 'bg-red-800 border-red-700'}`}>
                         <p>{authStatus === 'authenticated' ? 'Conectado!' : 'Erro na conexão.'}</p>
+                        {/* Adicionado o botão para Configurar / Autenticar quando não está conectado */}
+                        {authStatus !== 'authenticated' && (
+                            <button
+                                onClick={() => setShowConfig(true)}
+                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+                            >
+                                Configurar / Autenticar
+                            </button>
+                        )}
                     </div>
                 )}
 
@@ -343,7 +409,6 @@ const App = () => {
                 </div>
 
                 {/* Cards & Charts */}
-                {/* ... (Restante do JSX para os cards e gráficos - sem alterações) ... */}
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700"><div className="flex items-center"><Calendar className="h-8 w-8 text-blue-400 mr-3" /><div><p className="text-sm font-medium text-gray-400">Total</p><p className="text-2xl font-bold">{metrics.total}</p></div></div></div>
                     <div className="bg-gray-800 rounded-lg p-6 border border-gray-700"><div className="flex items-center"><TrendingUp className="h-8 w-8 text-blue-400 mr-3" /><div><p className="text-sm font-medium text-gray-400">IA</p><p className="text-2xl font-bold text-blue-400">{metrics.ia}</p><p className="text-sm text-gray-400">{metrics.iaPercentage}%</p></div></div></div>
