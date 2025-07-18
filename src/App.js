@@ -1,3 +1,8 @@
+Claro! Aqui está o código completo com a correção aplicada. Você pode copiar e colar diretamente no seu arquivo `App.js`.
+
+A única alteração foi na linha 391 (no código original), onde `removeRule={removeRule}` foi trocado por `removeRule={removeFilterRule}`.
+
+```javascript
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
@@ -22,46 +27,46 @@ const mockData = [
 
 // --- Componente para um único Grupo de Filtro (NOVO) ---
 const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
-    const daysOfWeek = [
-        { id: 1, name: 'Seg' }, { id: 2, name: 'Ter' }, { id: 3, name: 'Qua' },
-        { id: 4, name: 'Qui' }, { id: 5, name: 'Sex' }, { id: 6, name: 'Sáb' }, { id: 0, name: 'Dom' }
-    ];
+    const daysOfWeek = [
+        { id: 1, name: 'Seg' }, { id: 2, name: 'Ter' }, { id: 3, name: 'Qua' },
+        { id: 4, name: 'Qui' }, { id: 5, name: 'Sex' }, { id: 6, name: 'Sáb' }, { id: 0, name: 'Dom' }
+    ];
 
-    const handleDayChange = (dayId) => {
-        const newDays = rule.daysOfWeek.includes(dayId)
-            ? rule.daysOfWeek.filter(d => d !== dayId)
-            : [...rule.daysOfWeek, dayId];
-        updateRule(index, { ...rule, daysOfWeek: newDays });
-    };
+    const handleDayChange = (dayId) => {
+        const newDays = rule.daysOfWeek.includes(dayId)
+            ? rule.daysOfWeek.filter(d => d !== dayId)
+            : [...rule.daysOfWeek, dayId];
+        updateRule(index, { ...rule, daysOfWeek: newDays });
+    };
 
-    return (
-        <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 relative">
-            <button onClick={() => removeRule(index)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
-                <Trash2 size={18} />
-            </button>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                    <label className="text-sm font-medium text-gray-400 block mb-2">Dias da Semana</label>
-                    <div className="flex flex-wrap gap-2">
-                        {daysOfWeek.map(day => (
-                            <button key={day.id} onClick={() => handleDayChange(day.id)}
-                                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${rule.daysOfWeek.includes(day.id) ? 'bg-indigo-600 text-white' : 'bg-gray-600 hover:bg-gray-500'}`}>
-                                {day.name}
-                            </button>
-                        ))}
-                    </div>
-                </div>
-                <div>
-                    <label className="text-sm font-medium text-gray-400 block mb-2">Horário (0-23h)</label>
-                    <div className="flex items-center gap-2">
-                        <input type="number" min="0" max="23" value={rule.startTime} onChange={(e) => updateRule(index, { ...rule, startTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Início" />
-                        <span>às</span>
-                        <input type="number" min="0" max="23" value={rule.endTime} onChange={(e) => updateRule(index, { ...rule, endTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Fim" />
-                    </div>
-                </div>
-            </div>
-        </div>
-    );
+    return (
+        <div className="bg-gray-700/50 p-4 rounded-lg border border-gray-600 relative">
+            <button onClick={() => removeRule(index)} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors">
+                <Trash2 size={18} />
+            </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label className="text-sm font-medium text-gray-400 block mb-2">Dias da Semana</label>
+                    <div className="flex flex-wrap gap-2">
+                        {daysOfWeek.map(day => (
+                            <button key={day.id} onClick={() => handleDayChange(day.id)}
+                                className={`px-3 py-1.5 text-xs rounded-md transition-colors ${rule.daysOfWeek.includes(day.id) ? 'bg-indigo-600 text-white' : 'bg-gray-600 hover:bg-gray-500'}`}>
+                                {day.name}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+                <div>
+                    <label className="text-sm font-medium text-gray-400 block mb-2">Horário (0-23h)</label>
+                    <div className="flex items-center gap-2">
+                        <input type="number" min="0" max="23" value={rule.startTime} onChange={(e) => updateRule(index, { ...rule, startTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Início" />
+                        <span>às</span>
+                        <input type="number" min="0" max="23" value={rule.endTime} onChange={(e) => updateRule(index, { ...rule, endTime: e.target.value })} className="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-md" placeholder="Fim" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
 };
 
 // --- Componente Principal do App ---
@@ -388,7 +393,7 @@ const App = () => {
                     <div className="space-y-4">
                         <label className="text-sm font-medium text-gray-400">Regras de Horário (o agendamento deve corresponder a pelo menos uma regra)</label>
                         {filterRules.map((rule, index) => (
-                            <FilterRuleGroup key={index} index={index} rule={rule} updateRule={updateFilterRule} removeRule={removeRule} />
+                            <FilterRuleGroup key={index} index={index} rule={rule} updateRule={updateFilterRule} removeRule={removeFilterRule} />
                         ))}
                         <button onClick={addFilterRule} className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-600 hover:bg-gray-500 rounded-md transition-colors">
                             <PlusCircle size={16} />
@@ -453,3 +458,4 @@ const App = () => {
 };
 
 export default App;
+```
