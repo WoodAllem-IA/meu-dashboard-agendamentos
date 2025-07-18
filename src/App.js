@@ -1,8 +1,3 @@
-Claro! Aqui está o código completo com a correção aplicada. Você pode copiar e colar diretamente no seu arquivo `App.js`.
-
-A única alteração foi na linha 391 (no código original), onde `removeRule={removeRule}` foi trocado por `removeRule={removeFilterRule}`.
-
-```javascript
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
@@ -113,13 +108,13 @@ const App = () => {
         gsiScript.src = 'https://accounts.google.com/gsi/client';
         gsiScript.async = true;
         gsiScript.defer = true;
-        document.head.appendChild(gsiScript );
+        document.head.appendChild(gsiScript  );
 
         const gapiScript = document.createElement('script');
         gapiScript.src = 'https://apis.google.com/js/api.js';
         gapiScript.async = true;
         gapiScript.defer = true;
-        gapiScript.onload = ( ) => window.gapi.load('client', () => {});
+        gapiScript.onload = (  ) => window.gapi.load('client', () => {});
         document.head.appendChild(gapiScript);
     }, []);
 
@@ -138,7 +133,7 @@ const App = () => {
             const client = window.google.accounts.oauth2.initTokenClient({
                 client_id: config.clientId,
                 scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
-                callback: async (tokenResponse ) => {
+                callback: async (tokenResponse  ) => {
                     if (tokenResponse.error) {
                         throw new Error(tokenResponse.error);
                     }
@@ -160,7 +155,7 @@ const App = () => {
     const fetchDataFromSheets = async () => {
         setIsLoading(true);
         try {
-            await window.gapi.client.load('https://sheets.googleapis.com/$discovery/rest?version=v4' );
+            await window.gapi.client.load('https://sheets.googleapis.com/$discovery/rest?version=v4'  );
             const response = await window.gapi.client.sheets.spreadsheets.values.get({
                 spreadsheetId: config.spreadsheetId,
                 range: `${config.sheetName}!A:C`,
@@ -458,4 +453,3 @@ const App = () => {
 };
 
 export default App;
-```
