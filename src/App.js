@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
-import { AlertCircle, Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
+import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
 
 // --- Componente para um único Grupo de Filtro (NOVO) ---
 const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
