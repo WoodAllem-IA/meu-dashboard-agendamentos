@@ -2,6 +2,24 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { AreaChart, Area, BarChart, Bar, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { Calendar, CheckCircle, Clock, Download, Filter, PlusCircle, RefreshCw, Settings, Trash2, TrendingUp, Users } from 'lucide-react';
 
+// Dados simulados para exibição inicial (MOVIDO PARA FORA DO COMPONENTE)
+const mockData = [
+    { id: 'W', created: '2025-07-12T20:29:56', activity: 'agendadahumano', source: 'whatsapp' },
+    { id: 'Kuka', created: '2025-07-12T20:20:00', activity: 'agendadahumano', source: 'whatsapp' },
+    { id: 'Maiane', created: '2025-07-12T16:08:12', activity: 'agendadoia', source: 'whatsapp' },
+    { id: 'Eduarda', created: '2025-07-12T14:32:04', activity: 'agendadoia', source: 'whatsapp' },
+    { id: 'Sirlene', created: '2025-07-12T14:00:30', activity: 'agendadoia', source: 'whatsapp' },
+    { id: 'Rol', created: '2025-07-12T16:17:42', activity: 'agendadoia', source: 'whatsapp' },
+    // Adicione mais dados simulados se desejar para testar os filtros
+    { id: 'TestIA_Manha_Seg', created: '2025-07-14T09:30:00', activity: 'agendadoia', source: 'test' }, // Segunda, Manhã
+    { id: 'TestHumano_Noite_Sab', created: '2025-07-12T20:00:00', activity: 'agendadahumano', source: 'test' }, // Sábado, Noite
+    { id: 'TestIA_Tarde_Ter', created: '2025-07-15T14:00:00', activity: 'agendadoia', source: 'test' }, // Terça, Tarde
+    { id: 'TestHumano_Noite_Dom', created: '2025-07-13T01:00:00', activity: 'agendadahumano', source: 'test' }, // Domingo, Madrugada (Noite)
+    { id: 'TestIA_Comercial_Qui', created: '2025-07-17T10:00:00', activity: 'agendadoia', source: 'test' }, // Quinta, Horário Comercial
+    { id: 'TestHumano_ForaComercial_Sex', created: '2025-07-18T05:00:00', activity: 'agendadahumano', source: 'test' }, // Sexta, Fora do Horário Comercial (Manhã cedo)
+    { id: 'TestIA_ForaComercial_Qua', created: '2025-07-16T19:00:00', activity: 'agendadoia', source: 'test' }, // Quarta, Fora do Horário Comercial (Noite)
+];
+
 // --- Componente para um único Grupo de Filtro (NOVO) ---
 const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
     const daysOfWeek = [
@@ -48,7 +66,7 @@ const FilterRuleGroup = ({ rule, index, updateRule, removeRule }) => {
 
 // --- Componente Principal do App ---
 const App = () => {
-    const [data, setData] = useState([]);
+    const [data, setData] = useState(mockData); // Inicializa com mockData
     // Estado dos filtros agora é um ARRAY de regras
     const [filterRules, setFilterRules] = useState([]);
     const [globalFilters, setGlobalFilters] = useState({ startDate: '', endDate: '', type: 'all' });
@@ -69,6 +87,7 @@ const App = () => {
         };
     });
     const [authStatus, setAuthStatus] = useState('not_authenticated');
+    const [tokenClient, setTokenClient] = useState(null); // Mantido, mas não usado diretamente na lógica final
 
     // Funções para gerenciar as regras de filtro
     const addFilterRule = () => {
@@ -82,24 +101,6 @@ const App = () => {
     const removeFilterRule = (index) => {
         setFilterRules(filterRules.filter((_, i) => i !== index));
     };
-
-    // Dados simulados para exibição inicial (movido para dentro do componente para acesso)
-    const mockData = [
-        { id: 'W', created: '2025-07-12T20:29:56', activity: 'agendadahumano', source: 'whatsapp' },
-        { id: 'Kuka', created: '2025-07-12T20:20:00', activity: 'agendadahumano', source: 'whatsapp' },
-        { id: 'Maiane', created: '2025-07-12T16:08:12', activity: 'agendadoia', source: 'whatsapp' },
-        { id: 'Eduarda', created: '2025-07-12T14:32:04', activity: 'agendadoia', source: 'whatsapp' },
-        { id: 'Sirlene', created: '2025-07-12T14:00:30', activity: 'agendadoia', source: 'whatsapp' },
-        { id: 'Rol', created: '2025-07-12T16:17:42', activity: 'agendadoia', source: 'whatsapp' },
-        // Adicione mais dados simulados se desejar para testar os filtros
-        { id: 'TestIA_Manha_Seg', created: '2025-07-14T09:30:00', activity: 'agendadoia', source: 'test' }, // Segunda, Manhã
-        { id: 'TestHumano_Noite_Sab', created: '2025-07-12T20:00:00', activity: 'agendadahumano', source: 'test' }, // Sábado, Noite
-        { id: 'TestIA_Tarde_Ter', created: '2025-07-15T14:00:00', activity: 'agendadoia', source: 'test' }, // Terça, Tarde
-        { id: 'TestHumano_Noite_Dom', created: '2025-07-13T01:00:00', activity: 'agendadahumano', source: 'test' }, // Domingo, Madrugada (Noite)
-        { id: 'TestIA_Comercial_Qui', created: '2025-07-17T10:00:00', activity: 'agendadoia', source: 'test' }, // Quinta, Horário Comercial
-        { id: 'TestHumano_ForaComercial_Sex', created: '2025-07-18T05:00:00', activity: 'agendadahumano', source: 'test' }, // Sexta, Fora do Horário Comercial (Manhã cedo)
-        { id: 'TestIA_ForaComercial_Qua', created: '2025-07-16T19:00:00', activity: 'agendadoia', source: 'test' }, // Quarta, Fora do Horário Comercial (Noite)
-    ];
 
     // Carrega os scripts do Google (GSI para auth, GAPI para Sheets API)
     useEffect(() => {
@@ -387,7 +388,7 @@ const App = () => {
                     <div className="space-y-4">
                         <label className="text-sm font-medium text-gray-400">Regras de Horário (o agendamento deve corresponder a pelo menos uma regra)</label>
                         {filterRules.map((rule, index) => (
-                            <FilterRuleGroup key={index} index={index} rule={rule} updateRule={updateFilterRule} removeRule={removeFilterRule} />
+                            <FilterRuleGroup key={index} index={index} rule={rule} updateRule={updateFilterRule} removeRule={removeRule} />
                         ))}
                         <button onClick={addFilterRule} className="flex items-center gap-2 px-4 py-2 text-sm bg-gray-600 hover:bg-gray-500 rounded-md transition-colors">
                             <PlusCircle size={16} />
